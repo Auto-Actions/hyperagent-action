@@ -1,90 +1,171 @@
-HyperAgent GitHub Action
+# Gemini Code Generator Action
 
-This GitHub Action automatically generates source code based on the title and description of a newly created GitHub issue. It uses the Gemini API to understand the software idea and pushes the generated code to a new feature branch.
-How It Works
+🤖 Automatically generate code using Google's Gemini AI when GitHub issues are created.
 
-    Trigger: The action is triggered when an issue is created in your repository.
+## Features
 
-    Analyze: It reads the issue's title and body to form a prompt.
+- **Automatic Code Generation**: Generates complete, functional code based on issue descriptions
+- **Multiple Programming Languages**: Supports auto-detection or manual specification of programming languages
+- **Pull Request Creation**: Automatically creates pull requests with generated code
+- **Customizable Output**: Configurable output paths and branch naming
+- **Issue Integration**: Adds helpful comments back to the original issue
 
-    Generate: It sends the prompt to the Gemini API to generate the code, requesting a structured JSON output of file paths and their corresponding code.
+## Usage
 
-    Commit: It creates a new branch (e.g., feature/issue-123) and commits the generated files to it.
+### Basic Setup
 
-    Notify: It posts a comment on the original issue with a link to the newly created branch.
+1. Add the Gemini API key to your repository secrets as `GEMINI_API_KEY`
+2. Create a workflow file in `.github/workflows/generate-code.yml`:
 
-Setup and Usage
-
-To use this action, create a workflow file in your repository at .github/workflows/hyperagent-assistant.yml.
-Example Workflow
-
-name: 'HyperAgent Code Assistant'
+```yaml
+name: Generate Code from Issue
 
 on:
   issues:
     types: [opened]
 
 jobs:
-  generate_code:
+  generate-code:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write  # Required to push code
-      issues: write    # Required to comment on the issue
     steps:
-      - name: 'Generate Code from Issue'
-        uses: {your-github-username}/hyperagent-assistant-action@v1 # Replace with your action's path
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          gemini_api_key: ${{ secrets.GEMINI_API_KEY }}
+    - name: Checkout repository
+      uses: actions/checkout@v4
+      with:
+        token: ${{ secrets.GITHUB_TOKEN }}
+        
+    - name: Generate Code with Gemini
+      uses: your-username/gemini-code-generator-action@v1
+      with:
+        gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
+        github-token: ${{ secrets.GITHUB_TOKEN }}
+```
 
-Configuration
-Action Inputs
+### Advanced Configuration
 
-    github_token (Required): The GitHub token used to interact with the repository on your behalf.
+```yaml
+- name: Generate Code with Gemini
+  uses: your-username/gemini-code-generator-action@v1
+  with:
+    gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
+    github-token: ${{ secrets.GITHUB_TOKEN }}
+    output-path: 'generated-code'
+    programming-language: 'python'
+    branch-name: 'feature/ai-generated'
+    create-pull-request: 'true'
+    model-name: 'gemini-1.5-flash'
+```
 
-    gemini_api_key (Required): Your API key for the Gemini API.
+## Inputs
 
-    system_prompt (Optional): A custom system prompt to guide the model's behavior. If not provided, a default prompt is used to ensure JSON output.
+| Input | Description | Required | Default |
+|-------|-------------|----------|---------|
+| `gemini-api-key` | Google Gemini API key | Yes | - |
+| `github-token` | GitHub token with repo write permissions | Yes | `${{ github.token }}` |
+| `output-path` | Directory where generated code will be placed | No | `generated` |
+| `programming-language` | Preferred programming language | No | `auto-detect` |
+| `branch-name` | Base name for the generated code branch | No | `feature/generated-code` |
+| `create-pull-request` | Whether to create a pull request | No | `true` |
+| `model-name` | Gemini model to use | No | `gemini-1.5-flash` |
 
-Best Practices for Keys and Secrets
+## Outputs
 
-For security, your sensitive keys and tokens should always be stored as encrypted secrets, never as plain text in your workflow file.
+| Output | Description |
+|--------|-------------|
+| `generated-files` | Comma-separated list of generated files |
+| `pull-request-url` | URL of the created pull request (if applicable) |
+| `commit-sha` | SHA of the commit containing generated code |
 
-1. Using the GITHUB_TOKEN
+## How It Works
 
-The GITHUB_TOKEN is a special access token that GitHub automatically provides to your workflow. You don't need to create this secret yourself.
+1. **Issue Creation**: When an issue is created in your repository, the action is triggered
+2. **Content Analysis**: The action reads the issue title and description
+3. **Code Generation**: Uses Google's Gemini AI to generate appropriate code based on the requirements
+4. **File Creation**: Creates the generated code files in the specified directory
+5. **Git Operations**: Creates a new branch, commits the code, and pushes to the repository
+6. **Pull Request**: Optionally creates a pull request for review
+7. **Issue Update**: Adds a comment to the original issue with a link to the generated code
 
-    Usage: Simply pass it to the action using github_token: ${{ secrets.GITHUB_TOKEN }}.
+## Prerequisites
 
-    Permissions: For this action to work, you must grant the necessary permissions to the job in your workflow file, as shown in the example:
+### Gemini API Key
 
-    permissions:
-      contents: write  # Allows the action to create branches and commit code
-      issues: write    # Allows the action to comment on the issue
+1. Go to [Google AI Studio](https://makersuite.google.com/app/apikey)
+2. Create a new API key
+3. Add it to your repository secrets as `GEMINI_API_KEY`
 
-2. Configuring the GEMINI_API_KEY
+### Repository Permissions
 
-Your Gemini API key is a personal credential and must be kept private. You should add it as a repository secret.
+Ensure your `GITHUB_TOKEN` has the following permissions:
+- `contents: write` (to create branches and commit code)
+- `pull-requests: write` (to create pull requests)
+- `issues: write` (to comment on issues)
 
-    Go to your repository's Settings tab.
+## Example Issue Format
 
-    In the left sidebar, navigate to Secrets and variables > Actions.
+To get the best results, structure your issues like this:
 
-    Click the New repository secret button.
+```markdown
+Title: Create a Python web scraper for news articles
 
-    Name the secret GEMINI_API_KEY.
+## Description
+I need a Python script that can scrape news articles from multiple websites.
 
-    Paste your API key into the "Secret" field.
+## Requirements
+- Support for at least 3 news websites
+- Extract title, content, and publication date
+- Save results to JSON format
+- Include error handling for network issues
+- Use requests and BeautifulSoup libraries
 
-    Click Add secret.
+## Expected Output
+- A main scraper script
+- Configuration file for websites
+- Example usage script
+```
 
-Once added, you can securely access it in your workflow file using gemini_api_key: ${{ secrets.GEMINI_API_KEY }}.
-Building the Action (for Developers)
+## Supported Programming Languages
 
-If you've forked this repository and want to make changes, you'll need to package the Node.js code into a single file.
+The action supports auto-detection and manual specification of:
+- Python
+- JavaScript/Node.js
+- Java
+- C++
+- Go
+- And many more...
 
-    Install dependencies: npm install
+## Limitations
 
-    Bundle the code: npm run build
+- Generated code should be reviewed before production use
+- Complex requirements may need manual refinement
+- API rate limits may apply based on your Gemini usage
+- Large codebases might be split across multiple files
 
-This will use @vercel/ncc to compile index.js and all its node_modules into a single dist/index.js file, which is what the action's main property points to.
+## Security Considerations
+
+- The action only reads issue content (public information)
+- Generated code is committed to your repository
+- Ensure your Gemini API key is properly secured in GitHub Secrets
+- Review generated code before merging to main branch
+
+## Contributing
+
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests if applicable
+5. Submit a pull request
+
+## License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## Support
+
+If you encounter any issues or have questions:
+1. Check the [Issues](../../issues) page
+2. Create a new issue with detailed information
+3. Include relevant logs and error messages
+
+---
+
+**Note**: This action uses Google's Gemini AI service. Make sure you comply with Google's terms of service and usage policies.
