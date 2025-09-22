@@ -1,6 +1,6 @@
-# Gemini Code Generator Action
+# HyperAgent Generator Action
 
-🤖 Automatically generate code using Google's Gemini AI when GitHub issues are created.
+🤖 Automatically generate code when GitHub issues are created.
 
 ## Features
 
