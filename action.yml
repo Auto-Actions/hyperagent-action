@@ -1,0 +1,48 @@
+name: 'Gemini Code Generator'
+description: 'Automatically generate code using Google Gemini API when issues are created'
+author: 'Your Name'
+
+branding:
+  icon: 'code'
+  color: 'blue'
+
+inputs:
+  gemini-api-key:
+    description: 'Google Gemini API key'
+    required: true
+  github-token:
+    description: 'GitHub token with repository write permissions'
+    required: true
+    default: ${{ github.token }}
+  output-path:
+    description: 'Path where generated code should be placed'
+    required: false
+    default: 'generated'
+  programming-language:
+    description: 'Preferred programming language for code generation'
+    required: false
+    default: 'auto-detect'
+  branch-name:
+    description: 'Branch name for the generated code'
+    required: false
+    default: 'feature/generated-code'
+  create-pull-request:
+    description: 'Whether to create a pull request instead of direct push'
+    required: false
+    default: 'true'
+  model-name:
+    description: 'Gemini model to use'
+    required: false
+    default: 'gemini-1.5-flash'
+
+outputs:
+  generated-files:
+    description: 'List of generated files'
+  pull-request-url:
+    description: 'URL of created pull request (if applicable)'
+  commit-sha:
+    description: 'SHA of the commit containing generated code'
+
+runs:
+  using: 'docker'
+  image: 'Dockerfile'
