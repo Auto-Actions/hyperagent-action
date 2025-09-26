@@ -1,6 +1,6 @@
 const core = require('@actions/core');
 const github = require('@actions/github');
-const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { GoogleGenAI } = require('@google/genai');
 const fs = require('fs').promises;
 const path = require('path');
 const simpleGit = require('simple-git');
@@ -33,9 +33,8 @@ async function run() {
 
     core.info(`Processing issue #${issueNumber}: ${issueTitle}`);
 
-    // Initialize Gemini AI
-    const genAI = new GoogleGenerativeAI(geminiApiKey);
-    const model = genAI.getGenerativeModel({ model: modelName });
+    // Initialize Google Gen AI
+    const ai = new GoogleGenAI({apiKey: geminiApiKey});
 
     // Create comprehensive prompt for code generation
     const prompt = createCodeGenerationPrompt(issueTitle, issueBody, programmingLanguage);
@@ -43,9 +42,12 @@ async function run() {
     core.info('Generating code with Gemini API...');
     
     // Generate code using Gemini
-    const result = await model.generateContent(prompt);
-    const response = await result.response;
-    const generatedContent = response.text();
+    const response = await ai.models.generateContent({
+      model: modelName,
+      contents: prompt,
+    });
+    
+    const generatedContent = response.text;
 
     // Parse the generated content to extract files
     const files = parseGeneratedContent(generatedContent);
