@@ -20,9 +20,9 @@ async function run() {
     const context = github.context;
     const octokit = github.getOctokit(githubToken);
 
-    // Verify this is an issue creation event
-    if (context.eventName !== 'issues' || context.payload.action !== 'opened') {
-      core.setFailed('This action should only run on issue creation events');
+    // Verify this is an issue opened or reopened event
+    if (context.eventName !== 'issues' || !['opened', 'reopened'].includes(context.payload.action)) {
+      core.setFailed('This action should only run on issue opened or reopened events');
       return;
     }
 
