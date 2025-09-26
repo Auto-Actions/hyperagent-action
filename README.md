@@ -31,23 +31,23 @@ jobs:
     - name: Checkout repository
       uses: actions/checkout@v4
       with:
-        token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.ACTION_TOKEN }}
         
-    - name: Generate Code with Gemini
-      uses: your-username/gemini-code-generator-action@v1
+    - name: HyperAgent Generator
+      uses: Auto-Actions/hyperagent-action@v1.0.0-alpha
       with:
         gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
-        github-token: ${{ secrets.GITHUB_TOKEN }}
+        github-token: ${{ secrets.ACTION_TOKEN }}
 ```
 
 ### Advanced Configuration
 
 ```yaml
-- name: Generate Code with Gemini
-  uses: your-username/gemini-code-generator-action@v1
+- name: HyperAgent Generator
+  uses: Auto-Actions/hyperagent-action@v1.0.0-alpha
   with:
     gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
-    github-token: ${{ secrets.GITHUB_TOKEN }}
+    github-token: ${{ secrets.ACTION_TOKEN }}
     output-path: 'generated-code'
     programming-language: 'python'
     branch-name: 'feature/ai-generated'
@@ -95,7 +95,7 @@ jobs:
 
 ### Repository Permissions
 
-Ensure your `GITHUB_TOKEN` has the following permissions:
+Ensure your `ACTION_TOKEN` has the following permissions:
 - `contents: write` (to create branches and commit code)
 - `pull-requests: write` (to create pull requests)
 - `issues: write` (to comment on issues)
