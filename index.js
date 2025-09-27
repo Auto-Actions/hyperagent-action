@@ -39,7 +39,7 @@ async function run() {
     // Create comprehensive prompt for code generation
     const prompt = createCodeGenerationPrompt(issueTitle, issueBody, programmingLanguage);
     
-    core.info('Generating code with Gemini API...');
+    core.info('Generating code with HyperAgent...');
     
     // Generate code using Gemini
     const response = await ai.models.generateContent({
