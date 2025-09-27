@@ -39,7 +39,7 @@ async function run() {
     // Create comprehensive prompt for code generation
     const prompt = createCodeGenerationPrompt(issueTitle, issueBody, programmingLanguage);
     
-    core.info('Generating code with HyperAgent...');
+    core.info('Generating code with Gemini API...');
     
     // Generate code using Gemini
     const response = await ai.models.generateContent({
@@ -58,34 +58,38 @@ async function run() {
 
     core.info(`Generated ${files.length} file(s)`);
 
-    // Setup git
+    // Setup git - ensure we're in the workspace directory
+    process.chdir(process.env.GITHUB_WORKSPACE || '.');
     const git = simpleGit();
-
-    // Initialize git repository if needed
+    
+    // Initialize git if needed (shouldn't be necessary but safety check)
     try {
-      await git.init();
+      await git.status();
     } catch (error) {
-      core.warning(`Git init failed: ${error.message}`);
+      core.info('Repository not found, this should not happen in GitHub Actions context');
+      throw new Error('Git repository not accessible. Ensure action runs with proper checkout.');
     }
     
-    // Configure git
-    await git.addConfig('user.name', 'HyperAgent Code Generator');
-    await git.addConfig('user.email', 'action@github.com');
-
-    // Add remote if it doesn't exist
-    try {
-      const remoteUrl = `https://x-access-token:${githubToken}@github.com/${context.repo.owner}/${context.repo.repo}.git`;
-      await git.removeRemote('origin');
-      await git.addRemote('origin', remoteUrl);
-    } catch (error) {
-      core.warning(`Remote setup failed: ${error.message}`);
-    }
+    // Configure git with global config (not local)
+    await git.addConfig('user.name', 'Gemini Code Generator', false, 'global');
+    await git.addConfig('user.email', 'action@github.com', false, 'global');
 
     // Create and checkout new branch
     const timestamp = Date.now();
     const uniqueBranchName = `${branchName}-${issueNumber}-${timestamp}`;
     
-    await git.checkoutLocalBranch(uniqueBranchName);
+    try {
+      await git.checkoutLocalBranch(uniqueBranchName);
+    } catch (error) {
+      // If branch already exists, checkout and reset it
+      core.info(`Branch might exist, trying to checkout: ${uniqueBranchName}`);
+      try {
+        await git.checkout(uniqueBranchName);
+      } catch (checkoutError) {
+        // Create branch from current HEAD
+        await git.checkout(['-b', uniqueBranchName]);
+      }
+    }
 
     // Create output directory
     await fs.mkdir(outputPath, { recursive: true });
@@ -114,7 +118,7 @@ async function run() {
     generatedFiles.push(readmePath);
 
     // Add files to git
-    await git.add('.');
+    await git.add(['.']);
     
     // Commit changes
     const commitMessage = `Generate code for issue #${issueNumber}: ${issueTitle}
@@ -128,7 +132,13 @@ Generated at: ${new Date().toISOString()}`;
     await git.commit(commitMessage);
 
     // Push branch
-    await git.push('origin', uniqueBranchName);
+    try {
+      await git.push(['-u', 'origin', uniqueBranchName]);
+    } catch (pushError) {
+      core.warning(`Push failed, trying alternative method: ${pushError.message}`);
+      // Alternative push method
+      await git.raw(['push', '--set-upstream', 'origin', uniqueBranchName]);
+    }
 
     const commitSha = await git.revparse(['HEAD']);
 

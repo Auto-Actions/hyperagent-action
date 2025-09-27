@@ -3,6 +3,12 @@ FROM node:18-alpine
 # Install git and other dependencies
 RUN apk add --no-cache git openssh-client
 
+# Configure git globally to avoid local config issues
+RUN git config --global init.defaultBranch main
+RUN git config --global user.name "Gemini Code Generator"
+RUN git config --global user.email "action@github.com"
+RUN git config --global --add safe.directory '*'
+
 # Set working directory
 WORKDIR /app
 
