@@ -60,10 +60,26 @@ async function run() {
 
     // Setup git
     const git = simpleGit();
+
+    // Initialize git repository if needed
+    try {
+      await git.init();
+    } catch (error) {
+      core.warning(`Git init failed: ${error.message}`);
+    }
     
     // Configure git
-    await git.addConfig('user.name', 'Gemini Code Generator');
+    await git.addConfig('user.name', 'HyperAgent Code Generator');
     await git.addConfig('user.email', 'action@github.com');
+
+    // Add remote if it doesn't exist
+    try {
+      const remoteUrl = `https://x-access-token:${githubToken}@github.com/${context.repo.owner}/${context.repo.repo}.git`;
+      await git.removeRemote('origin');
+      await git.addRemote('origin', remoteUrl);
+    } catch (error) {
+      core.warning(`Remote setup failed: ${error.message}`);
+    }
 
     // Create and checkout new branch
     const timestamp = Date.now();
