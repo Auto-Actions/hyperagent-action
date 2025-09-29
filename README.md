@@ -34,7 +34,7 @@ jobs:
         token: ${{ secrets.ACTION_TOKEN }}
         
     - name: HyperAgent Generator
-      uses: Auto-Actions/hyperagent-action@v1.0.0-alpha
+      uses: Auto-Actions/hyperagent-action@v2.0.0
       with:
         gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
         github-token: ${{ secrets.ACTION_TOKEN }}
@@ -44,7 +44,7 @@ jobs:
 
 ```yaml
 - name: HyperAgent Generator
-  uses: Auto-Actions/hyperagent-action@v1.0.0-alpha
+  uses: Auto-Actions/hyperagent-action@v2.0.0
   with:
     gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
     github-token: ${{ secrets.ACTION_TOKEN }}
