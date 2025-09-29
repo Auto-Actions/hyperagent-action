@@ -1,6 +1,6 @@
 # HyperAgent Generator Action
 
-🤖 Automatically generate code when GitHub issues are created.
+🤖 Automatically generate code by interacting with GitHub issues.
 
 ## Features
 
@@ -77,9 +77,9 @@ jobs:
 
 ## How It Works
 
-1. **Issue Creation**: When an issue is created in your repository, the action is triggered
+1. **Issue Creation**: When an issue is created/edited/reopened in your repository, the action is triggered
 2. **Content Analysis**: The action reads the issue title and description
-3. **Code Generation**: Uses Google's Gemini AI to generate appropriate code based on the requirements
+3. **Code Generation**: Uses HyperAgent to generate appropriate code based on the requirements
 4. **File Creation**: Creates the generated code files in the specified directory
 5. **Git Operations**: Creates a new branch, commits the code, and pushes to the repository
 6. **Pull Request**: Optionally creates a pull request for review
