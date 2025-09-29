@@ -22,7 +22,7 @@ name: Generate Code from Issue
 
 on:
   issues:
-    types: [opened]
+    types: [opened, reopened, edited]
 
 jobs:
   generate-code:
