@@ -1,5 +1,5 @@
 name: 'HyperAgent Generator'
-description: 'Automatically generate code using Google Gemini API when issues are created'
+description: 'Automatically generate code when issues are created'
 author: 'Your Name'
 
 branding:
