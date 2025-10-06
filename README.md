@@ -1,6 +1,6 @@
-# HyperAgent Generator Action
+# ContractHyperAgent Generator Action
 
-🤖 Automatically generate code by interacting with GitHub issues.
+🤖 Automatically generate code by interacting with GitHub issues and Telegram.
 
 ## Features
 
