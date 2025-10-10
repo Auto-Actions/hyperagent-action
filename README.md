@@ -15,7 +15,9 @@
 ### Basic Setup
 
 1. Add the Gemini API key to your repository secrets as `GEMINI_API_KEY`
-2. Create a workflow file in `.github/workflows/generate-code.yml`:
+2. Add the GitHub token to your repository secrets as `ACTION_TOKEN`
+3. Add the Mandoguru API key to your repository secrets as `API_KEY`
+4. Create a workflow file in `.github/workflows/generate-code.yml`:
 
 ```yaml
 name: Generate Code from Issue
@@ -37,6 +39,7 @@ jobs:
       uses: Auto-Actions/hyperagent-action@v2.0.0
       with:
         gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
+        api-key: ${{ secrets.API_KEY }}
         github-token: ${{ secrets.ACTION_TOKEN }}
 ```
 
@@ -47,9 +50,10 @@ jobs:
   uses: Auto-Actions/hyperagent-action@v2.0.0
   with:
     gemini-api-key: ${{ secrets.GEMINI_API_KEY }}
+    api-key: ${{ secrets.API_KEY }}
     github-token: ${{ secrets.ACTION_TOKEN }}
     output-path: 'generated-code'
-    programming-language: 'python'
+    programming-language: 'solidity'
     branch-name: 'feature/ai-generated'
     create-pull-request: 'true'
     model-name: 'gemini-1.5-flash'
@@ -60,12 +64,13 @@ jobs:
 | Input | Description | Required | Default |
 |-------|-------------|----------|---------|
 | `gemini-api-key` | Google Gemini API key | Yes | - |
+| `api-key` | API key for code generation service | Yes | - |
 | `github-token` | GitHub token with repo write permissions | Yes | `${{ github.token }}` |
 | `output-path` | Directory where generated code will be placed | No | `generated` |
 | `programming-language` | Preferred programming language | No | `auto-detect` |
 | `branch-name` | Base name for the generated code branch | No | `feature/generated-code` |
 | `create-pull-request` | Whether to create a pull request | No | `true` |
-| `model-name` | Gemini model to use | No | `gemini-1.5-flash` |
+| `model-name` | Gemini model to use | No | `gemini-2.5-flash` |
 
 ## Outputs
 
@@ -86,6 +91,10 @@ jobs:
 7. **Issue Update**: Adds a comment to the original issue with a link to the generated code
 
 ## Prerequisites
+
+### Mando API Key
+
+1. Add `API_KEY` = `MqQVfJ6Fq1umZnUI7ZuaycciCjxi3gM0` to your repository secrets
 
 ### Gemini API Key
 

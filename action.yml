@@ -7,9 +7,13 @@ branding:
   color: 'blue'
 
 inputs:
-  gemini-api-key:
-    description: 'Google Gemini API key'
+  api-key:
+    description: 'API key for the code generation service'
     required: true
+  api-endpoint:
+    description: 'Base URL for the code generation API'
+    equired: false
+    default: 'http://mandoguru.com:8000/v1.0.0/gen_prog/'
   github-token:
     description: 'GitHub token with repository write permissions'
     required: true

@@ -4,17 +4,20 @@ const { GoogleGenAI } = require('@google/genai');
 const fs = require('fs').promises;
 const path = require('path');
 const simpleGit = require('simple-git');
+const axios = require('axios');
 
 async function run() {
   try {
     // Get inputs
-    const geminiApiKey = core.getInput('gemini-api-key', { required: true });
+    const apiKey = core.getInput('api-key', { required: true });
+    const apiEndpoint = core.getInput('api-endpoint', { required: true });
+    // const geminiApiKey = core.getInput('gemini-api-key', { required: true });
     const githubToken = core.getInput('github-token', { required: true });
     const outputPath = core.getInput('output-path') || 'generated';
     const programmingLanguage = core.getInput('programming-language') || 'auto-detect';
     const branchName = core.getInput('branch-name') || 'feature/generated-code';
     const createPR = core.getInput('create-pull-request') === 'true';
-    const modelName = core.getInput('model-name') || 'gemini-2.5-pro';
+    // const modelName = core.getInput('model-name') || 'gemini-2.5-pro';
 
     // Get GitHub context
     const context = github.context;
@@ -33,22 +36,37 @@ async function run() {
 
     core.info(`Processing issue #${issueNumber}: ${issueTitle}`);
 
-    // Initialize Google Gen AI
-    const ai = new GoogleGenAI({apiKey: geminiApiKey});
-
-    // Create comprehensive prompt for code generation
-    const prompt = createCodeGenerationPrompt(issueTitle, issueBody, programmingLanguage);
+    // Create request payload
+    const payload = {
+      title: issueTitle,
+      description: issueBody,
+      language: programmingLanguage,
+      // Add any other required fields for your API
+    };
     
     core.info('Generating code ...');
     
-    // Generate code
-    const response = await ai.models.generateContent({
-      model: modelName,
-      contents: prompt,
+    // Call custom API
+    core.info('Generating code using custom API...');
+    const response = await axios({
+      method: 'POST',
+      url: `${apiEndpoint}/v1.0.0/gen_prog/`,
+      headers: {
+        'Content-Type': 'application/json',
+        'X-API-Key': apiKey,
+      },
+      params: {
+        dependencies: dependencies
+      },
+      data: payload
     });
-    
-    const generatedContent = response.text;
 
+    if (!response.data || response.status !== 200) {
+      throw new Error('Failed to generate code from API');
+    }
+
+    const generatedContent = response.data;
+    
     // Parse the generated content to extract files
     const files = parseGeneratedContent(generatedContent);
     
